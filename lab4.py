@@ -70,9 +70,5 @@ for i in range(len(ranks)):
 
 arr = sorted(arr, key=lambda x: x[1], reverse=True)[:10]
 
-print(unique_links)
-print(pages)
-print(pages_list)
-
 for a in arr:
     print(a)
