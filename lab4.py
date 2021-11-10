@@ -5,11 +5,15 @@ from bs4 import BeautifulSoup
 from bs4.dammit import EncodingDetector
 import requests
 from tkinter import Tk, simpledialog
+import re
 
+regex = re.compile(r"http(|s)://.+/(?=\w)")
 plt.figure(figsize=(15, 10))
 
 Tk().withdraw()
 START_URL = simpledialog.askstring("Input", "Insert the link to process!")
+matcher = regex.search(START_URL)
+START_URL = START_URL if matcher is None else matcher.group()
 D = 0.5
 start_string_to_concat = START_URL[:-1]
 GLOBAL_LINKS = []
@@ -27,7 +31,7 @@ def parse_url(url):
     all_links = []
     for lnk in soup.find_all('a', href=True):
         full_link = start_string_to_concat + lnk['href']
-        if "http" not in lnk['href'] and full_link != url:
+        if "http" not in lnk['href'] and lnk['href'].startswith("/") and full_link != url:
             all_links.append(full_link)
     if len(all_links) == 0:
         return
@@ -42,7 +46,7 @@ unique_links = list(set(GLOBAL_LINKS))
 G.add_edges_from(unique_links)
 pos = nx.spring_layout(G)
 nx.draw_networkx_nodes(G, pos, node_size=500, node_color='green', edgecolors='black')
-nx.draw_networkx_edges(G, pos, edgelist=G.edges, edge_color='black')
+nx.draw_networkx_edges(G, pos, edgelist=G.edges, edge_color='black', arrowsize=20)
 nx.draw_networkx_labels(G, pos)
 plt.show()
 
@@ -69,10 +73,6 @@ for i in range(len(ranks)):
     arr.append([pages_list[i], ranks[i]])
 
 arr = sorted(arr, key=lambda x: x[1], reverse=True)[:10]
-
-print(unique_links)
-print(pages)
-print(pages_list)
 
 for a in arr:
     print(a)
